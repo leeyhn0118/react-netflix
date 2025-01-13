@@ -25,8 +25,10 @@ export default function Nav() {
 
     const handleChange = (e) => {
         setSearchValue(e.target.value);
-        navigate(`/search?q=${e.target.value}`);
-    }
+        navigate(`/search?q=${e.target.value}`, {
+            replace: e.target.value.length === 1 ? false : true,
+        });
+    };
 
     return (
         <nav className={`nav ${show && "nav_black"}`}>
