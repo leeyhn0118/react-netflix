@@ -3,16 +3,16 @@ import "./Nav.css"
 import { useNavigate } from 'react-router-dom'
 
 export default function Nav() {
-    const [show, setshow] = useState(false)
+    const [show, setShow] = useState(false)
     const [searchValue, setSearchValue] = useState("")
 
     useEffect(() => {
         window.addEventListener("scroll", () => {
             console.log('scroll: ')
             if (window.scrollY > 50) {
-                setshow(true)
+                setShow(true)
             } else {
-                setshow(false)
+                setShow(false)
             }
         })
 
@@ -34,7 +34,7 @@ export default function Nav() {
                 alt='Netflix logo'
                 src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png'
                 className='nav_logo'
-                onClick={() => window.location.reload()}
+                onClick={() => window.location.href = "/react-netflix"}
             />
 
             <input
