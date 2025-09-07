@@ -13,72 +13,89 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 
 export default function Row({ isLargeRow, title, id, fetchUrl }) {
-    const [movies, setMovies] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [movieSelected, setMovieSelected] = useState({});
+  const [movies, setMovies] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [movieSelected, setMovieSelected] = useState({});
 
-    useEffect(() => {
-        fetchMovieData();
-    }, []);
+  useEffect(() => {
+    fetchMovieData();
+  }, []);
 
-    const fetchMovieData = async () => {
-        const request = await axios.get(fetchUrl);
-        console.log("request", request);
-        setMovies(request.data.results);
-    };
+  const fetchMovieData = async () => {
+    const request = await axios.get(fetchUrl);
+    console.log("request", request);
+    setMovies(request.data.results);
+  };
 
-    const handleClick = (movie) => {
-        setModalOpen(true);
-        setMovieSelected(movie);
-    };
+  const handleClick = (movie) => {
+    setModalOpen(true);
+    setMovieSelected(movie);
+  };
 
-    return (
-        <section className="row">
-            <h2>{title}</h2>
-            <Swiper
-                modules={[Navigation, Pagination, Scrollbar, A11y]}
-                loop={true}
-                breakpoints={{
-                    1378: {
-                        slidesPerView: 6,
-                        slidesPerGroup: 6,
-                    },
-                    998: {
-                        slidesPerView: 5,
-                        slidesPerGroup: 5,
-                    },
-                    625: {
-                        slidesPerView: 4,
-                        slidesPerGroup: 4,
-                    },
-                    0: {
-                        slidesPerView: 3,
-                        slidesPerGroup: 3,
-                    },
-                }}
-                navigation
-                pagination={{ clickable: true }}
-            >
-                <div id={id} className="row__posters">
-                    {movies.map((movie) => (
-                        <SwiperSlide>
-                            <img
-                                key={movie.id}
-                                style={{ padding: "25px 0" }}
-                                className={`row__poster ${isLargeRow && "row__posterLarge"}`}
-                                src={`https://image.tmdb.org/t/p/original/${isLargeRow ? movie.poster_path : movie.backdrop_path
-                                    } `}
-                                alt={movie.name}
-                                onClick={() => handleClick(movie)}
-                            />
-                        </SwiperSlide>
-                    ))}
+  return (
+    <section className='row'>
+      <h2>{title}</h2>
+      <Swiper
+        modules={[Navigation, Pagination, Scrollbar, A11y]}
+        loop={true}
+        breakpoints={{
+          1378: {
+            slidesPerView: 6,
+            slidesPerGroup: 6,
+          },
+          998: {
+            slidesPerView: 5,
+            slidesPerGroup: 5,
+          },
+          625: {
+            slidesPerView: 4,
+            slidesPerGroup: 4,
+          },
+          0: {
+            slidesPerView: 3,
+            slidesPerGroup: 3,
+          },
+        }}
+        navigation
+        pagination={{ clickable: true }}
+      >
+        <div id={id} className='row__posters'>
+          {movies.map((movie) => {
+            const titleText = movie.title || movie.name || movie.original_name;
+            const imgSrc = `https://image.tmdb.org/t/p/original/${
+              isLargeRow ? movie.poster_path : movie.backdrop_path
+            }`;
+
+            return (
+              <SwiperSlide key={movie.id}>
+                <div
+                  className={`posterCard ${
+                    isLargeRow ? "posterCard--large" : ""
+                  }`}
+                  role='button'
+                  tabIndex={0}
+                  onClick={() => handleClick(movie)}
+                  onKeyDown={(e) => e.key === "Enter" && handleClick(movie)}
+                >
+                  <img
+                    className={`row__poster ${
+                      isLargeRow ? "row__posterLarge" : ""
+                    }`}
+                    src={imgSrc}
+                    alt={titleText}
+                    style={{ padding: "15px 0" }}
+                  />
+                  <span className='row__title'>{titleText}</span>
                 </div>
-            </Swiper>
+              </SwiperSlide>
+            );
+          })}
+        </div>
+      </Swiper>
 
-            {modalOpen && (
-                <MovieModal {...movieSelected} setModalOpen={setModalOpen} />
-            )}
-        </section>
-    );
+      {modalOpen && (
+        <MovieModal {...movieSelected} setModalOpen={setModalOpen} />
+      )}
+    </section>
+  );
 }

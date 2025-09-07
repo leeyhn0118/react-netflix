@@ -1,92 +1,103 @@
-import axios from '../api/axios';
-import React, { useEffect, useState } from 'react'
-import requests from '../api/requests';
-import './Banner.css';
-import styled from 'styled-components';
+import axios from "../api/axios";
+import React, { useEffect, useState } from "react";
+import requests from "../api/requests";
+import "./Banner.css";
+import styled from "styled-components";
+import MovieModal from "./MovieModal";
 
 export default function Banner() {
-    const [movie, setMovie] = useState([]);
-    const [isClicked, setIsClicked] = useState(false)
-    useEffect(() => {
-        fetchData();
-    }, []);
+  const [movie, setMovie] = useState([]);
+  const [isClicked, setIsClicked] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
-    const fetchData = async () => {
-        const request = await axios.get(requests.fetchNowPlaying);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-        const movieId = request.data.results[
-            Math.floor(Math.random() * request.data.results.length)
-        ].id;
+  const fetchData = async () => {
+    const request = await axios.get(requests.fetchNowPlaying);
 
-        const { data: movieDetail } = await axios.get(`movie/${movieId}`, {
-            params: { append_to_response: "videos" },
-        });
-        setMovie(movieDetail)
-    };
+    const movieId =
+      request.data.results[
+        Math.floor(Math.random() * request.data.results.length)
+      ].id;
 
-    const truncate = (str, n) => {
-        return str?.length > n ? str.substr(0, n - 1) + "..." : str;
-    }
-    console.log('movie', movie)
-    if (!isClicked) {
-        return (
-            <header className='banner'
-                style={{
-                    backgroundImage: `url("https://image.tmdb.org/t/p/original/${movie.backdrop_path}")`,
-                    backgroundPosition: "top center",
-                    backgroundSize: "cover"
-                }}>
-                <div className='banner_contents'>
-                    <h1 className='banner_title'>
-                        {movie.title || movie.name || movie.original_name}
-                    </h1>
+    const { data: movieDetail } = await axios.get(`movie/${movieId}`, {
+      params: { append_to_response: "videos" },
+    });
+    setMovie(movieDetail);
+  };
 
-                    <div className='banner_buttons'>
-                        <button
-                            className='banner_button play'
-                            onClick={() => setIsClicked(true)}
-                        >
-                            Play
-                        </button>
-                        <button className='banner_button info'>
-                            More Information
-                        </button>
-                    </div>
-                    <h1 className='banner_description'>{truncate(movie.overview, 100)}</h1>
-                </div>
-                <div className='banner--fadeBottom' />
-            </header>
-        )
-    } else {
-        return (
-            <Container>
-                <HomeContainer>
-                    <Iframe
-                        src={`https://www.youtube.com/embed/${movie.videos.results[0].key}?controls=1&autoplay=1&loop=1&mute=1&playlist=${movie.videos.results[0].key}`}
-                        width="640"
-                        height="360"
-                        frameborder="0"
-                        allow="autoplay; fullscreen"
-                    ></Iframe>
-                </HomeContainer>
-            </Container>
-        )
-    }
+  const truncate = (str, n) => {
+    return str?.length > n ? str.substr(0, n - 1) + "..." : str;
+  };
+  console.log("movie", movie);
+  if (!isClicked) {
+    return (
+      <header
+        className='banner'
+        style={{
+          backgroundImage: `url("https://image.tmdb.org/t/p/original/${movie.backdrop_path}")`,
+          backgroundPosition: "top center",
+          backgroundSize: "cover",
+        }}
+      >
+        <div className='banner_contents'>
+          <h1 className='banner_title'>
+            {movie.title || movie.name || movie.original_name}
+          </h1>
+
+          <div className='banner_buttons'>
+            <button
+              className='banner_button play'
+              onClick={() => setIsClicked(true)}
+            >
+              Play
+            </button>
+            <button
+              className='banner_button info'
+              onClick={() => setModalOpen(true)}
+            >
+              More Information
+            </button>
+          </div>
+          <h1 className='banner_description'>
+            {truncate(movie.overview, 100)}
+          </h1>
+        </div>
+        <div className='banner--fadeBottom' />
+        {modalOpen && <MovieModal {...movie} setModalOpen={setModalOpen} />}
+      </header>
+    );
+  } else {
+    return (
+      <Container>
+        <HomeContainer>
+          <Iframe
+            src={`https://www.youtube.com/embed/${movie.videos.results[0].key}?controls=1&autoplay=1&loop=1&mute=1&playlist=${movie.videos.results[0].key}`}
+            width='640'
+            height='360'
+            frameborder='0'
+            allow='autoplay; fullscreen'
+          ></Iframe>
+        </HomeContainer>
+      </Container>
+    );
+  }
 }
 
-
 const Container = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    flex-direction: column;
-    height: 100vh
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-direction: column;
+  height: 100vh;
 `;
 
 const HomeContainer = styled.div`
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 `;
 
 const Iframe = styled.iframe`
